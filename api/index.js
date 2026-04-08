@@ -6,15 +6,18 @@ const router = require('./self_modules/routes/routes');
 const routerSecure = require('./self_modules/routes/routesSecure');
 const authorize = require('./self_modules/middlewares/authorize');
 const corsOptions = require('./self_modules/middlewares/cors');
-const cookieParser = require('cookie-parser'); 
+const cookieParser = require('cookie-parser');
+const logger = require('./self_modules/middlewares/logger');
 
 const app = express();
 
 app.use(express.urlencoded({extended:true}));
 app.use(bodyParser.json({limit:"1.1MB"}));
 app.use(express.static('public'));
-app.use(cookieParser()); 
+app.use(cookieParser());
 app.use(cors(corsOptions))
+// 📋 Forensic logging – logs every request to logs/access.log
+app.use(logger);
 app.use('/', router);
 app.use(authorize);
 app.use('/', routerSecure);

@@ -1,4 +1,4 @@
-exports.readCookie = (cname) => {
+const readCookie = (cname) => {
     var name = cname + "=";
     var decodedCookie = decodeURIComponent(document.cookie);
     var ca = decodedCookie.split(';');
@@ -14,10 +14,13 @@ exports.readCookie = (cname) => {
     return undefined;
 }
 
-exports.checkIfConnected = () => {
-    let token = this.readCookie("Token")
+const checkIfConnected = () => {
+    let token = readCookie("Token")
     if (token !== undefined) {
         return true;
     }
     return false;
 }
+
+const tools = { readCookie, checkIfConnected };
+export default tools;
