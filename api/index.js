@@ -9,6 +9,8 @@ const authorize = require('./self_modules/middlewares/authorize');
 const corsOptions = require('./self_modules/middlewares/cors');
 const cookieParser = require('cookie-parser');
 const logger = require('./self_modules/middlewares/logger');
+const dataController = require('./controllers/dataController');
+const checkIfAdmin = require('./self_modules/middlewares/checkIfAdmin');
 
 const app = express();
 
@@ -20,18 +22,25 @@ app.use(cors(corsOptions))
 // 📋 Forensic logging – logs every request to logs/access.log
 app.use(logger);
 
-// API routes
-app.use('/api', router);
-app.use('/api', authorize, routerSecure);
+// Middleware : si la requête a un header 'token', c'est une requête API
+const isApiRequest = (req, res, next) => {
+    if (req.headers.token) {
+        next(); // C'est une requête API, continuer
+    } else {
+        next('route'); // Pas de token = navigation navigateur, passer au catch-all
+    }
+};
 
-// Legacy routes (sans /api) pour compatibilité
-app.post('/connection', require('./controllers/dataController').connectUser);
-app.use('/user', authorize, (req, res) => require('./controllers/dataController').fetchDataUser(req, res));
-app.use('/admin', authorize, require('./self_modules/middlewares/checkIfAdmin'), (req, res) => require('./controllers/dataController').getVictory(req, res));
-app.get('/blog', authorize, (req, res) => require('./controllers/dataController').fetchBlogMessages(req, res));
-app.post('/blog', authorize, (req, res) => require('./controllers/dataController').createBlogmessage(req, res));
+// Route publique (pas besoin de token)
+app.post('/connection', dataController.connectUser);
 
-// SPA catch-all : toutes les autres routes servent index.html
+// Routes protégées : seulement si header 'token' est présent
+app.get('/user', isApiRequest, authorize, dataController.fetchDataUser);
+app.get('/admin', isApiRequest, authorize, checkIfAdmin, dataController.getVictory);
+app.get('/blog', isApiRequest, authorize, dataController.fetchBlogMessages);
+app.post('/blog', authorize, dataController.createBlogmessage);
+
+// SPA catch-all : toutes les autres routes servent index.html (React)
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
