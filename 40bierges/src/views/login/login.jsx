@@ -50,7 +50,10 @@ class Login extends React.Component {
         let d = new Date();
         d.setTime(d.getTime() + (3 * 24 * 60 * 60 * 1000));
         let expires = "expires=" + d.toUTCString();
-        document.cookie = "Token=" + response.data.token + ";" + expires + ";path=/";
+        // En production, ajouter Secure et SameSite pour les cookies HTTPS
+        const isProduction = window.location.protocol === 'https:';
+        const secureAttr = isProduction ? ';Secure;SameSite=Strict' : '';
+        document.cookie = "Token=" + response.data.token + ";" + expires + ";path=/" + secureAttr;
         if (response.data.role === "user") {
           this.setState({ redirected: true });
         } else if (response.data.role === "admin") {
