@@ -3,6 +3,7 @@ import { Redirect } from 'react-router-dom';
 import '../../assets/css/main.css';
 import axios from "axios";
 import tools from "../../toolBox";
+import getApiUrl from "../../config";
 
 class Admin extends React.Component {
 
@@ -14,7 +15,7 @@ class Admin extends React.Component {
             token: "",
             userList: [],
             isLoading: true,
-            url: "http://localhost:3001"
+            url: getApiUrl()
         };
         this.toggleSecret = this.toggleSecret.bind(this);
     }

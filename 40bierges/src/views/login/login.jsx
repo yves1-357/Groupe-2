@@ -3,6 +3,7 @@ import { Redirect } from 'react-router-dom';
 import '../../assets/css/main.css';
 import tools from "../../toolBox";
 import axios from "axios";
+import getApiUrl from "../../config";
 
 class Login extends React.Component {
 
@@ -15,10 +16,16 @@ class Login extends React.Component {
       password: "",
       error: "",
       isLoading: false,
-      url: "http://localhost:3001"
+      showPassword: false,
+      url: getApiUrl()
     };
     this.handleConnect = this.handleConnect.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.togglePasswordVisibility = this.togglePasswordVisibility.bind(this);
+  }
+
+  togglePasswordVisibility() {
+    this.setState({ showPassword: !this.state.showPassword });
   }
 
   componentDidMount() {
@@ -49,7 +56,10 @@ class Login extends React.Component {
         let d = new Date();
         d.setTime(d.getTime() + (3 * 24 * 60 * 60 * 1000));
         let expires = "expires=" + d.toUTCString();
-        document.cookie = "Token=" + response.data.token + ";" + expires + ";path=/";
+        // En production, ajouter Secure et SameSite pour les cookies HTTPS
+        const isProduction = window.location.protocol === 'https:';
+        const secureAttr = isProduction ? ';Secure;SameSite=Strict' : '';
+        document.cookie = "Token=" + response.data.token + ";" + expires + ";path=/" + secureAttr;
         if (response.data.role === "user") {
           this.setState({ redirected: true });
         } else if (response.data.role === "admin") {
@@ -111,17 +121,42 @@ class Login extends React.Component {
 
           <div className="form-group">
             <label className="form-label" htmlFor="login-password">Mot de passe</label>
-            <input
-              id="login-password"
-              className="form-input"
-              type="password"
-              name="password"
-              value={this.state.password}
-              onChange={this.handleChange}
-              onKeyDown={this.handleKeyDown}
-              placeholder="••••••••"
-              autoComplete="current-password"
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                id="login-password"
+                className="form-input"
+                type={this.state.showPassword ? "text" : "password"}
+                name="password"
+                value={this.state.password}
+                onChange={this.handleChange}
+                onKeyDown={this.handleKeyDown}
+                placeholder="••••••••"
+                autoComplete="current-password"
+                style={{ paddingRight: '45px' }}
+              />
+              <button
+                type="button"
+                onClick={this.togglePasswordVisibility}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '18px',
+                  padding: '5px',
+                  opacity: '0.6',
+                  transition: 'opacity 0.2s'
+                }}
+                onMouseEnter={(e) => e.target.style.opacity = '1'}
+                onMouseLeave={(e) => e.target.style.opacity = '0.6'}
+                aria-label={this.state.showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+              >
+                {this.state.showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
           </div>
 
           <button
