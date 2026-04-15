@@ -3,6 +3,7 @@ import { Redirect } from 'react-router-dom';
 import '../../assets/css/main.css';
 import axios from "axios";
 import tools from "../../toolBox";
+import getApiUrl from "../../config";
 
 class Admin extends React.Component {
 
