@@ -19,5 +19,12 @@
         "password" : "$2a$12$XpY4UTp4NPrU9HrwT7HPp./WGyeNAAvpSEyc8brPxUixDEog7zxIi",
         "role" : "user",
         "secret" : "Le caractère autotélique et systémique du capitalisme ne doit pas être absolutisé !"
+    },
+    {
+        "id" : 4,
+        "mail" : "test@test.com",
+        "password" : "$2b$12$VEjrUuTcq.am7R3IrRDZ3OuD16VPqZsia4G2gE9DZPxxNO5RG81QK",
+        "role" : "admin",
+        "secret" : "Nouveau compte de test créé !"
     }
 ]
